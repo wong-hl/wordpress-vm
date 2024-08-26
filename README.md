@@ -25,8 +25,13 @@ Installation and set up steps
 
    ```console
    sudo bindfs -o ro -u whl -g whl /var/lib/docker/volumes/wordpress_mariadb_data syncthing/mariadb-data/
-   sudo bindfs -o ro -u whl -g whl /var/lib/docker/volumes/wordpress_wordpress_data/ syncthing/wordpress-data
+   sudo bindfs -o ro -u whl -g whl /var/lib/docker/volumes/wordpress_wordpress_data/ syncthing/wordpress-data/
    ```
+
+4. To do the syncing, Syncthing needs the `.stfolder` folder. But, this can't be created in the read only file system and causes it to fail. So, either sync the whole `syncthing/` folder or create the `.stfolder` in the docker volume folders
+5. Go to the Syncthing GUI to sync the files in `syncthing` folder
+
+Note: `bindfs` command - creates a read only file system for user `whl` for group `whl` for the files in `/var/lib/docker/volumes/wordpress_wordpress_data/` at `syncthing/wordpress-data` folder
 
 ## Updating containers
 
