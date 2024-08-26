@@ -1,5 +1,6 @@
 # Copyright Broadcom, Inc. All Rights Reserved.
 # SPDX-License-Identifier: APACHE-2.0
+# Adapted from: https://github.com/bitnami/containers/blob/43aeee3153936450ce4859ed08b135c91113d80d/bitnami/wordpress/docker-compose.yml
 
 services:
   mariadb:
@@ -9,7 +10,7 @@ services:
     volumes:
       - 'mariadb_data:/bitnami/mariadb'
     env_file:
-      - '/home/whl/wordpress/.env'
+      - ./.env'
     environment:
       - MARIADB_USER=bn_wordpress
       - MARIADB_DATABASE=bitnami_wordpress
