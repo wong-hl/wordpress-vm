@@ -14,6 +14,7 @@ services:
     environment:
       - MARIADB_USER=bn_wordpress
       - MARIADB_DATABASE=bitnami_wordpress
+    restart: always
   wordpress:
     image: docker.io/bitnami/wordpress-nginx:latest
     networks:
@@ -36,6 +37,7 @@ services:
       - WORDPRESS_DATABASE_NAME=bitnami_wordpress
       - WORDPRESS_ENABLE_HTTPS=yes
       - WORDPRESS_BLOG_NAME="Hui Ling Wong"
+    restart: always
 
 networks:
   wordpress-network:
