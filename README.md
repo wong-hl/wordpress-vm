@@ -40,3 +40,17 @@ As this is a problem that lots of people encounter, a solution out there exits!!
 The [docs for wordpress-ngix](https://github.com/bitnami/containers/blob/main/bitnami/wordpress-nginx/README.md#upgrade-this-image) have more detailed instructions on how to upgrade which involves backing up the container by taking a snapshot of the application state. I'm going to assume for now that this isn't necessary.
 
 If there comes a time where this more involved method is required, [Bealdung has a bash script](https://www.baeldung.com/ops/docker-container-auto-update-newest-base-images#2-preserving-configurations-during-automatic-updates) which could be adapted (if necessary).
+
+## Add restart policy to container 
+
+Reference: [Bealdung article](https://www.baeldung.com/ops/docker-containers-start-automatically#applying-a-restart-policy-to-an-existing-container)
+
+```shell
+$ docker update --restart=<policy> <my-container>
+$ docker inspect -f "{{ .HostConfig.RestartPolicy.Name }}" <my-container> # to verify
+always # returns always if restart policy has been set
+```
+
+A better way to might be to [add it to the docker compose itself](https://www.baeldung.com/ops/docker-containers-start-automatically#adding-restart-policies-in-docker-compose)
+
+
