@@ -16,7 +16,7 @@ services:
       - MARIADB_DATABASE=bitnami_wordpress
     restart: always
   wordpress:
-    image: docker.io/bitnami/wordpress-nginx:latest
+    image: public.ecr.aws/bitnami/wordpress-nginx:latest
     networks:
       - wordpress-network
     ports:
