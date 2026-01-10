@@ -93,6 +93,7 @@ class MonitorConfig:
     telegram_chat_id: str
     recovery_commands: List[str]
     pause_file: Path
+    run_in_dir: Path
     log_level: str = "INFO"
     maintenance_windows: List[tuple] = None
     error_threshold: int = 3
@@ -118,6 +119,10 @@ class MonitorConfig:
         error_threshold = int(os.getenv("ERROR_THRESHOLD", "3"))
         error_window_seconds = int(os.getenv("ERROR_WINDOW_SECONDS", "180"))
         pause_file = Path(os.getenv("PAUSE_FILE", "/var/run/http-monitor.pause"))
+        run_in_dir = Path(os.getenv("TARGET_DIR", "."))
+
+        if not run_in_dir.exists():
+            raise ValueError("Directory to execute commands in does not exists")
 
         commands_str = os.getenv(
             "RECOVERY_COMMANDS", "systemctl status nginx,echo 'Command 2'"
@@ -136,6 +141,7 @@ class MonitorConfig:
             telegram_chat_id=telegram_chat_id,
             recovery_commands=recovery_commands,
             pause_file=pause_file,
+            run_in_dir=run_in_dir,
             log_level=log_level,
             maintenance_windows=maintenance_windows,
             error_threshold=error_threshold,
@@ -191,6 +197,7 @@ class MonitorConfig:
                 "Error Threshold",
                 f"{self.error_threshold} in {self.error_window_seconds}s",
             )
+            table.add_row("Execute command in dir", str(self.run_in_dir))
 
             if self.maintenance_windows:
                 windows_str = ", ".join(
@@ -212,6 +219,7 @@ class MonitorConfig:
             logger.info(
                 f"Configuration:  URL={self.url}, Interval={self.check_interval}s, "
                 f"ChatID={self.telegram_chat_id}, Commands={len(self.recovery_commands)}, "
+                f"TargetDir={self.run_in_dir}, "
                 f"ErrorThreshold={self.error_threshold}/{self.error_window_seconds}s"
             )
 
@@ -484,6 +492,9 @@ def run_monitor(config: MonitorConfig) -> None:
 
     # Register cleanup
     atexit.register(lambda: send_shutdown_notification(config, alert_count))
+
+    # Move into dir where commands are run
+    os.chdir(config.run_in_dir)
 
     try:
         while not shutdown_requested:
