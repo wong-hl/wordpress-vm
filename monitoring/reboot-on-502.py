@@ -447,17 +447,17 @@ def run_monitor(config: MonitorConfig) -> None:
     if config.maintenance_windows:
         logger.info(f"Maintenance windows configured: {len(config.maintenance_windows)}")
     
-    logger.info(f"Pause file: {PAUSE_FILE}")
+    logger.info(f"Pause file: {config.pause_file}")
     
     if IS_TTY:
         console.print("[dim]Press Ctrl+C to stop[/dim]\n")
     
     send_startup_notification(config)
     
-    alert_count = 0
+    alert_count: int = 0
     error_tracker = ErrorTracker(config.error_threshold, config.error_window_seconds)
-    in_maintenance = False
-    was_paused = False
+    in_maintenance: bool = False
+    was_paused: bool = False
     
     # Register cleanup
     atexit.register(lambda: send_shutdown_notification(config, alert_count))
