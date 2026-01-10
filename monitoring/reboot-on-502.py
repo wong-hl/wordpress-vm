@@ -75,7 +75,7 @@ logger = logging.getLogger("http_monitor")
 shutdown_requested = False
 
 # Pause file location
-PAUSE_FILE = Path("/var/run/http-monitor.pause")
+# PAUSE_FILE = Path("/var/run/http-monitor.pause")
 
 
 def signal_handler(signum, frame):
@@ -98,6 +98,7 @@ class MonitorConfig:
     telegram_bot_token: str
     telegram_chat_id: str
     recovery_commands: List[str]
+    pause_file: Path
     log_level: str = "INFO"
     maintenance_windows: List[tuple] = None
     error_threshold: int = 3
@@ -119,6 +120,7 @@ class MonitorConfig:
         log_level = os.getenv("LOG_LEVEL", "INFO")
         error_threshold = int(os.getenv("ERROR_THRESHOLD", "3"))
         error_window_seconds = int(os.getenv("ERROR_WINDOW_SECONDS", "180"))
+        pause_file = Path(os.getenv("PAUSE_FILE", "/var/run/http-monitor.pause"))
         
         commands_str = os.getenv("RECOVERY_COMMANDS", "systemctl status nginx,echo 'Command 2'")
         recovery_commands = [cmd.strip() for cmd in commands_str.split(",")]
@@ -134,6 +136,7 @@ class MonitorConfig:
             telegram_bot_token=telegram_bot_token,
             telegram_chat_id=telegram_chat_id,
             recovery_commands=recovery_commands,
+            pause_file=pause_file,
             log_level=log_level,
             maintenance_windows=maintenance_windows,
             error_threshold=error_threshold,
@@ -191,7 +194,7 @@ class MonitorConfig:
                                         for s, e in self.maintenance_windows])
                 table.add_row("Maintenance Windows", windows_str)
             
-            table.add_row("Pause File", str(PAUSE_FILE))
+            table.add_row("Pause File", str(self.pause_file))
             table.add_row("Running as", "Interactive TTY" if IS_TTY else "Service/Background")
             
             console.print(table)
@@ -254,9 +257,9 @@ def is_in_maintenance_window(config: MonitorConfig) -> bool:
     return False
 
 
-def is_monitoring_paused() -> bool:
+def is_monitoring_paused(pause_file: Path) -> bool:
     """Check if monitoring is paused via pause file"""
-    return PAUSE_FILE.exists()
+    return pause_file.exists()
 
 
 def send_telegram_message(config: MonitorConfig, message: str) -> None:
@@ -462,7 +465,7 @@ def run_monitor(config: MonitorConfig) -> None:
     try:
         while not shutdown_requested:
             # Check pause file
-            if is_monitoring_paused():
+            if is_monitoring_paused(config.pause_file):
                 if not was_paused:
                     logger.info("⏸️  Monitoring paused (pause file detected)")
                     was_paused = True
