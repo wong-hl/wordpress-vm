@@ -10,7 +10,7 @@
 # ///
 
 """
-Script to check whether bad gateway error has occurred
+Script to check whether bad gateway error has occurred created with help from Claude
 """
 
 #!/usr/bin/env python3
