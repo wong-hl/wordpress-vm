@@ -164,7 +164,7 @@ class MonitorConfig:
                     dt_time(start_hour, start_min),
                     dt_time(end_hour, end_min)
                 ))
-            except ValueError as e:
+            except ValueError as _:
                 logger.error(f"Invalid maintenance window format: {window}")
         
         return windows
@@ -214,7 +214,7 @@ class ErrorTracker:
     
     def __init__(self, threshold: int, window_seconds: int):
         self.threshold = threshold
-        self. window = timedelta(seconds=window_seconds)
+        self.window = timedelta(seconds=window_seconds)
         self.errors = deque()
     
     def add_error(self) -> bool:
@@ -483,7 +483,7 @@ def run_monitor(config: MonitorConfig) -> None:
                     logger.info("⏸️  Entered maintenance window - monitoring paused")
                     in_maintenance = True
                 
-                time. sleep(config.check_interval)
+                time.sleep(config.check_interval)
                 continue
             else: 
                 if in_maintenance:
